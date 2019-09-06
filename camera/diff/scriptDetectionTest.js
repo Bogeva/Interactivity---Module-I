@@ -44,7 +44,7 @@ function renderFrame() {
   if (oldFrame !== null) {
     // Iterate over each pixel
     //detect if pixel changed in a zone
-    for (let row = 0; row < 150; row++) {
+    for (let row = 0; row < 450; row++) {
       for (let pixelIndex = 0; pixelIndex < 150; pixelIndex++) {
         // Compare this pixel between two frames
         if (comparePixel(frame, oldFrame, pixelIndex + 640 * row)) {
@@ -56,7 +56,7 @@ function renderFrame() {
     }
   }
 
-  diffCount = 100 - Math.floor(100 * (diffCount / (150 * 150)));
+  diffCount = 100 - Math.floor(100 * (diffCount / (450 * 150)));
 
   // Add a condition about the difference counter
   if (diffCount > 2) {

@@ -1,40 +1,45 @@
-const cameraEl = document.getElementById('camera');
-const canvasEl = document.getElementById('captureCanvas');
-const offscreenCanvasEl = document.getElementById('offscreenCanvas');
+const cameraEl = document.getElementById("camera");
+const canvasEl = document.getElementById("captureCanvas");
+const offscreenCanvasEl = document.getElementById("offscreenCanvas");
 let oldFrame = null;
 let oldFrameCapturedAt = 0;
 
-let audio = document.querySelector('audio');
-let color = 'black';
+let audio = document.querySelector("audio");
+let color = "black";
+
+let audioTimer;
 
 startCamera();
 
-cameraEl.addEventListener('play', () => {
-  console.log('Video stream started');
+cameraEl.addEventListener("play", () => {
+  console.log("Video stream started");
   offscreenCanvasEl.width = cameraEl.videoWidth;
   offscreenCanvasEl.height = cameraEl.videoHeight;
   canvasEl.width = cameraEl.videoWidth;
   canvasEl.height = cameraEl.videoHeight;
-    
 
   // Start processing frames
   window.requestAnimationFrame(renderFrame);
 });
 
 function renderFrame() {
-  let offscreenC = offscreenCanvasEl.getContext('2d');
-  let c = canvasEl.getContext('2d');
+  let offscreenC = offscreenCanvasEl.getContext("2d");
+  let c = canvasEl.getContext("2d");
 
   // 1. Capture to offscreen buffer
   offscreenC.drawImage(cameraEl, 0, 0);
-  let frame = offscreenC.getImageData(0, 0, offscreenCanvasEl.width, offscreenCanvasEl.height);
+  let frame = offscreenC.getImageData(
+    0,
+    0,
+    offscreenCanvasEl.width,
+    offscreenCanvasEl.height
+  );
 
-  let totalPixels = frame.data.length / 4;   // 4 is used here since frame is represented as RGBA
+  let totalPixels = frame.data.length / 4; // 4 is used here since frame is represented as RGBA
 
-    
   // Keep track of how many pixels have changed
   let diffCount = 0;
-    
+
   // If we've already processed a frame, compare the new frame with it
   if (oldFrame !== null) {
     // Iterate over each pixel
@@ -42,34 +47,37 @@ function renderFrame() {
     for (let row = 0; row < 150; row++) {
       for (let pixelIndex = 0; pixelIndex < 150; pixelIndex++) {
         // Compare this pixel between two frames
-        if (comparePixel(frame, oldFrame, (pixelIndex+640*row))) {
+        if (comparePixel(frame, oldFrame, pixelIndex + 640 * row)) {
           // If true, it means they are the same, so set to opaque
-          frame.data[(pixelIndex+640*row) * 4 + 3] = 1;
+          frame.data[(pixelIndex + 640 * row) * 4 + 3] = 1;
           diffCount++; // Keep track of how many we find
         }
       }
     }
   }
 
-  diffCount = 100 - Math.floor(100 * (diffCount / (150*150)));      
+  diffCount = 100 - Math.floor(100 * (diffCount / (150 * 150)));
 
-  for (let v = 0; v < totalPixels; v++) {
-    if (diffCount > 5) {
-      // if there is movement in the square, every pixels change
-      //frame.data[v * 4 + 3] = 0; //transparent so black
-
-      frame.data[v * 4 + 0] += 50;
-      frame.data[v * 4 + 1] += 5;
-      frame.data[v * 4 + 2] += 20;  
-      
-      audio.play();
-
-    } else {
-
-      audio.pause();
+  // Add a condition about the difference counter
+  if (diffCount > 2) {
+    // we clear the timer out of computer's memory
+    clearTimeout(audioTimer);
+    // and we set it to false
+    audioTimer = false;
+    //play the audio
+    audio.play();
+  } else {
+    // if the condition is not fulfilled check if there is no timer
+    if (!audioTimer) {  
+      //if no timer set it up and pause the audio after 5 seconds.    
+      audioTimer = setTimeout(() => {
+        audioTimer = false;
+        audio.pause();
+      }, 5000);
     }
   }
-       
+
+
   // Draw something in the background so transparency is more obvious
   c.fillStyle = color;
   c.fillRect(0, 0, canvasEl.width, canvasEl.height);
@@ -79,11 +87,12 @@ function renderFrame() {
 
   // Write contents of buffer to visible canvas
   c.drawImage(offscreenCanvasEl, 0, 0);
-    
+
   // Give a numerical readout of proportion of pixels that have changed
-  c.fillStyle = 'white';
-  c.font = '48px "Fira Code", Monaco, "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace';
-  c.fillText(diffCount + '%', 100, 100);
+  c.fillStyle = "white";
+  c.font =
+    '48px "Fira Code", Monaco, "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace';
+  c.fillText(diffCount + "%", 100, 100);
 
   let now = Date.now();
   let keepFrame = true;
@@ -122,33 +131,36 @@ function comparePixel(frameA, frameB, i) {
   // Use Math.abs to make negative values positive
   // (we don't care if the new value is higher or lower, just that it's changed)
   let diff = Math.abs(bwA - bwB);
-    //si tu met la valeur en face de diff à 100 ça fait juste les edges, ainsi de suite
+  //si tu met la valeur en face de diff à 100 ça fait juste les edges, ainsi de suite
   if (diff < 30) return true;
   return false;
 }
-
-
 
 // ------------------------
 
 // Reports outcome of trying to get the camera ready
 function cameraReady(err) {
   if (err) {
-    console.log('Camera not ready: ' + err);
+    console.log("Camera not ready: " + err);
     return;
   }
-  console.log('Camera ready');
+  console.log("Camera ready");
 }
 
 // Tries to get the camera ready, and begins streaming video to the cameraEl element.
 function startCamera() {
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  navigator.getUserMedia =
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia;
   if (!navigator.getUserMedia) {
-    cameraReady('getUserMedia not supported');
+    cameraReady("getUserMedia not supported");
     return;
   }
-  navigator.getUserMedia({ video: true },
-    (stream) => {
+  navigator.getUserMedia(
+    { video: true },
+    stream => {
       try {
         cameraEl.srcObject = stream;
       } catch (error) {
@@ -156,7 +168,8 @@ function startCamera() {
       }
       cameraReady();
     },
-    (error) => {
+    error => {
       cameraReady(error);
-    });
+    }
+  );
 }

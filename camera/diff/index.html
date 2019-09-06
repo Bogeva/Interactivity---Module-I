@@ -10,12 +10,16 @@
   <link rel='stylesheet' href='style.css'>
 </head>
 <body touch-action="none">
-
+  
+  <audio id ="audio">
+    <source src="bensound-anewbeginning.mp3" type="audio/mpeg">
+  </audio>
   
   <!-- Video element for showing camera stream -->
   <video style="display:none" autoplay="true" id="camera"></video>
 
-  <script defer src="script.js"></script>
+  <script defer src="scriptDetectionTest.js"></script>
+  
 
   <canvas id="captureCanvas"></canvas>
   <canvas id="offscreenCanvas" style="display:none"></canvas>

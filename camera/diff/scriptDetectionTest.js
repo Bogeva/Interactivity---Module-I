@@ -4,6 +4,7 @@ const offscreenCanvasEl = document.getElementById('offscreenCanvas');
 let oldFrame = null;
 let oldFrameCapturedAt = 0;
 
+let audio = document.querySelector('audio');
 let color = 'black';
 
 startCamera();
@@ -59,7 +60,13 @@ function renderFrame() {
 
       frame.data[v * 4 + 0] += 50;
       frame.data[v * 4 + 1] += 5;
-      frame.data[v * 4 + 2] += 20;        
+      frame.data[v * 4 + 2] += 20;  
+      
+      audio.play();
+
+    } else {
+
+      audio.pause();
     }
   }
        

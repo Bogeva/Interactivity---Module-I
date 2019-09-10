@@ -43,16 +43,24 @@ function renderFrame() {
   let totalPixels = frame.data.length / 4; // Get total number of pixels by dividing by 4 (since each pixel uses 4 values)
   for (let pixelIndex = 0; pixelIndex < totalPixels; pixelIndex++) {
     // This shows you how to get the RGB values. We just want B
-    // let r = frame.data[pixelIndex * 4 + 0];
-    // let g = frame.data[pixelIndex * 4 + 1];
+    let r = frame.data[pixelIndex * 4 + 0];
+    let g = frame.data[pixelIndex * 4 + 1];
     let b = frame.data[pixelIndex * 4 + 2];
-
-    // let grey = (r + g + b) / 3 - how to calculate the gray color
+      
+    // let grey = (r+g+b)/3; //et ainsi de suite
 
     // If amount of blue is less than 150 (out of 255), set the pixel to transparent
-    if (b < 150) {
-      frame.data[pixelIndex * 4 + 3] = 0; // Set alpha to 0 (transparent)
-      // fran.date[(pixelIndex + 100) * 4 + 3] = 0 - it changes the 100 pixels in advance the alpha value  
+    //if (b < 150) { // ou if (b > 150) { avec du vert pour un effet blue screen tsais
+      //frame.data[pixelIndex * 4 + 3] = 0; // Set alpha to 0 (transparent)
+      //frame.data[pixelIndex * 4 + 2] = 255; // Devient tout en bleu, là tu peux modifier la couleur ou l'alpha du pixel en question en gros
+      //blueCount++;
+    //}
+      
+// If amount of color is more than 50 (out of 255), set the pixel to transparent
+    if (b < 80 && g < 80 && r < 80 ) { 
+    frame.data[pixelIndex * 4 + 0] = (r-80);
+    frame.data[pixelIndex * 4 + 1] = (g-80);
+    frame.data[pixelIndex * 4 + 2] = (b-80);
       blueCount++;
     }
   }

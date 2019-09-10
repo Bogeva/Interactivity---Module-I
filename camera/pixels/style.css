@@ -9,3 +9,10 @@ body {
   justify-content: center;
   background-color: darkslategray;
 }
+
+#rectangle1 {
+    width: 150px;
+    height: 150px;
+    border-style: none;
+    margin: 20px;
+}

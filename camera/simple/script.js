@@ -51,7 +51,7 @@ function startCamera() {
     return;
   }
 
-  navigator.getUserMedia({ video: true }, //maybe do changes where you request a certain camera or even ask for audio
+  navigator.getUserMedia({ video: true },
     (stream) => {
       try {
         cameraEl.srcObject = stream;

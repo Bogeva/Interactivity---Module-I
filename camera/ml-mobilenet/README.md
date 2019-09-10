@@ -1,5 +1,8 @@
+# ml-mobilenet
 
-# Read mode
+Scans for objects in a scene, dumping names of detected objects.
+
+# Read more
 
 * [Google's demo](https://github.com/tensorflow/tfjs-models/tree/master/mobilenet)
 * [Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/) (MDN)

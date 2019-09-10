@@ -58,7 +58,7 @@ function processPoses(poses) {
 
   // Demo of using position:
   //  Calculates a 'slouch factor' - difference in Y between left/right shoulders
-  if (poses.length == 1 && poses[0].score > 0.3) {
+  /*if (poses.length == 1 && poses[0].score > 0.3) {
     const leftShoulder = getKeypointPos(poses, 'leftShoulder');
     const rightShoulder = getKeypointPos(poses, 'rightShoulder');
     if (leftShoulder != null && rightShoulder != null) {
@@ -69,10 +69,10 @@ function processPoses(poses) {
       c.fillStyle = 'black';
       c.fillText('Slouch factor: ' + slouchFactor, 100, 10);
     }
-  }
+  }*/
 
   //  Calculates a 'head tilt factor' - difference in Y between left/right ears
-  if (poses.length == 1 && poses[0].score > 0.3) {
+  /*if (poses.length == 1 && poses[0].score > 0.3) {
     const leftEar = getKeypointPos(poses, 'leftEar');
     const rightEar = getKeypointPos(poses, 'rightEar');
     if (leftEar != null && rightEar != null) {
@@ -82,7 +82,32 @@ function processPoses(poses) {
       c.fillStyle = 'black';
       c.fillText('Head tilt factor: ' + headTilt, 200, 10);
     }
+  }*/
+
+  function map_range(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
+  //  Calculates a 'hands distance' - difference in Y between left/right ears
+  if (poses.length == 1 && poses[0].score > 0.3) {
+    const leftWrist = getKeypointPos(poses, 'leftWrist');
+    const rightWrist = getKeypointPos(poses, 'rightWrist');
+    if (leftWrist != null && rightWrist != null) {
+      const handsDistance = Math.floor(Math.abs(leftWrist.x - rightWrist.x));
+      const handsHeight = Math.floor(Math.abs(leftWrist.y - rightWrist.y));
+      const haaaaaands = Math.floor(Math.abs((leftWrist.y - rightWrist.y)+(leftWrist.x - rightWrist.x)));
+
+      opacity = map_range(handsDistance, 0, 500, 0, 255);
+
+
+      var c = canvasEl.getContext('2d');
+      c.fillStyle = 'pink';
+      c.fillText('hands width: ' + handsDistance, 300, 10);
+      c.fillText('hands height: ' + handsHeight, 200, 10);
+      c.fillText('hands: ' + haaaaaands, 100, 10);
+    }
   }
+
 
   // Repeat, if not paused
   if (cameraEl.paused) {

@@ -7,7 +7,6 @@ let oldFrameCapturedAt = 0;
 let audio = document.querySelector("audio");
 let color = "black";
 
-let audioTimer;
 
 startCamera();
 
@@ -59,22 +58,19 @@ function renderFrame() {
   diffCount = 100 - Math.floor(100 * (diffCount / (450 * 150)));
 
   // Add a condition about the difference counter
-  if (diffCount > 2) {
-    // we clear the timer out of computer's memory
-    clearTimeout(audioTimer);
-    // and we set it to false
-    audioTimer = false;
-    //play the audio
+  if (diffCount > 10 && diffCount <= 25) {
     audio.play();
+    audio.playbackRate = 1.5;
+  }else if(diffCount > 40){
+    audio.playbackRate = 3;
+  }else if (diffCount > 25 && diffCount < 40){
+    audio.play();
+    audio.playbackRate = 1.9;
+  }else if(diffCount >= 0 && diffCount<=1){
+    audio.pause();
   } else {
-    // if the condition is not fulfilled check if there is no timer
-    if (!audioTimer) {  
-      //if no timer set it up and pause the audio after 5 seconds.    
-      audioTimer = setTimeout(() => {
-        audioTimer = false;
-        audio.pause();
-      }, 5000);
-    }
+    audio.play()
+    audio.playbackRate = 1;
   }
 
 
@@ -99,7 +95,7 @@ function renderFrame() {
 
   // At the moment we always compare to the last frame from the camera,
   // but we could make a logic so comparison frames are only kept every second, for example:
-  //if (now-oldFrameCapturedAt < 1000) keepFrame = false;
+  if (now-oldFrameCapturedAt < 5600) keepFrame = false;
 
   // Or, this only keeps the first frame and never updates it
   // if (oldFrame !== null) keepFrame = false;

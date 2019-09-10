@@ -51,6 +51,10 @@ function process() {
   }).then(processPoses); /* call processPoses with result */
 }
 
+function map_range(value, low1, high1, low2, high2) {
+  return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
 function processPoses(poses) {
   // For debug purposes, draw points
   drawPoses(poses);
@@ -84,10 +88,6 @@ function processPoses(poses) {
     }
   }*/
 
-  function map_range(value, low1, high1, low2, high2) {
-    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
-}
-
   //  Calculates a 'hands distance' - difference in Y between left/right ears
   if (poses.length == 1 && poses[0].score > 0.3) {
     const leftWrist = getKeypointPos(poses, 'leftWrist');
@@ -97,8 +97,8 @@ function processPoses(poses) {
       const handsHeight = Math.floor(Math.abs(leftWrist.y - rightWrist.y));
       const haaaaaands = Math.floor(Math.abs((leftWrist.y - rightWrist.y)+(leftWrist.x - rightWrist.x)));
 
-      opacity = map_range(handsDistance, 0, 500, 0, 255);
-
+      scoreColor = map_range(handsDistance, 0, 500, 0, 255);
+      scoreColor2 = map_range(handsHeight, 0, 500, 0, 255);
 
       var c = canvasEl.getContext('2d');
       c.fillStyle = 'pink';
@@ -134,7 +134,8 @@ function drawPoses(poses) {
   c.drawImage(cameraEl, 0, 0, cameraEl.videoWidth, cameraEl.videoHeight);
 
   // Fade out image
-  c.fillStyle = 'rgba('+scoreColor+',255,255,'+opacity+')';
+  c.fillStyle = 'rgba('+scoreColor+','+scoreColor2+',255,'+opacity+')';
+  console.log(c.fillStyle);
   c.fillRect(0, 0, cameraEl.videoWidth, cameraEl.videoHeight);
 
   // Draw each detected pose
@@ -156,9 +157,9 @@ function drawPose(index, pose, c) {
   if (!poseColours[index]) poseColours[index] = getRandomColor();
   const colour = poseColours[index];
   
-
-  scoreColor = (pose.score*1.5)*255;
-  console.log(scoreColor);
+ 
+  opacity = map_range(pose.score, 0, 0.6, 0, 1);
+  //console.log(scoreColor);
 
   // Draw prediction info
   c.textBaseline = 'top';

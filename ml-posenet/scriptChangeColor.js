@@ -63,7 +63,7 @@ function processPoses(poses) {
     const rightShoulder = getKeypointPos(poses, 'rightShoulder');
     if (leftShoulder != null && rightShoulder != null) {
       const slouchFactor = Math.floor(Math.abs(leftShoulder.y - rightShoulder.y));
-      opacity = slouchFactor/100;
+      opacity = slouchFactor/130;
 
       var c = canvasEl.getContext('2d');
       c.fillStyle = 'black';

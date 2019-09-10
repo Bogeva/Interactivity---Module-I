@@ -1,3 +1,7 @@
 {
-    "liveServer.settings.port": 5501
+    "githubPullRequests.remotes": [
+        "origin",
+        "upstream",
+        "https://github.com/Bogeva/Interactivity---Module-I"
+    ]
 }

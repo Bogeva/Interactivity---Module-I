@@ -12,7 +12,6 @@ cameraEl.addEventListener('play', () => {
   offscreenCanvasEl.height = cameraEl.videoHeight;
   canvasEl.width = cameraEl.videoWidth;
   canvasEl.height = cameraEl.videoHeight;
-    
 
   // Start processing frames
   window.requestAnimationFrame(renderFrame);
@@ -40,14 +39,6 @@ function renderFrame() {
         // If true, it means they are the same, so set transparent
         frame.data[pixelIndex * 4 + 3] = 0;
         diffCount++; // Keep track of how many we find
-          
-        //detect if pixel changed in a zone
-        for (let row = 0; row < 30; row++) {
-          for (let pixelIndex2 = 0; pixelIndex2 < 30; pixelIndex2++) {
-            frame.data[pixelIndex2+(640*row) * 4 + 0] = 255;
-          }
-          //console.log('ople');
-        }
       }
     }
   }
@@ -108,8 +99,7 @@ function comparePixel(frameA, frameB, i) {
   // Use Math.abs to make negative values positive
   // (we don't care if the new value is higher or lower, just that it's changed)
   let diff = Math.abs(bwA - bwB);
-    //si tu met la valeur en face de diff à 100 ça fait juste les edges, ainsi de suite
-  if (diff < 30) return true;
+  if (diff < 5) return true;
   return false;
 }
 

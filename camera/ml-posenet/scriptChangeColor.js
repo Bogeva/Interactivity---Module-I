@@ -5,6 +5,7 @@ const resultsEl = document.getElementById('results');
 const poseColours = [];
 var opacity = 0;
 var scoreColor = 255; 
+var scoreColor2 = 255; 
 
 let colorBox = document.getElementById("myDiv");
 
@@ -117,7 +118,8 @@ function processPoses(poses) {
       }
     
       scoreColor = map_range(handsDistance, 0, 500, 0, 255);
-      scoreColor2 = map_range(handsHeight, 0, 500, 0, 255);
+
+      opacity = map_range(handsHeight, 0, 500, 0, 0.8);
 
       var c = canvasEl.getContext('2d');
       c.fillStyle = 'pink';
@@ -154,7 +156,7 @@ function drawPoses(poses) {
 
   // Fade out image
   c.fillStyle = 'rgba('+scoreColor+','+scoreColor2+',255,'+opacity+')';
-  console.log(c.fillStyle);
+  //.log(c.fillStyle);
   c.fillRect(0, 0, cameraEl.videoWidth, cameraEl.videoHeight);
 
   // Draw each detected pose
@@ -175,9 +177,7 @@ function drawPose(index, pose, c) {
   // Lookup or generate random colour for this pose index
   if (!poseColours[index]) poseColours[index] = getRandomColor();
   const colour = poseColours[index];
-  
- 
-  opacity = map_range(pose.score, 0, 0.6, 0, 1);
+
   //console.log(scoreColor);
 
   // Draw prediction info

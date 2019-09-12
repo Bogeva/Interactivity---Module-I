@@ -4,7 +4,9 @@ const canvasEl = document.getElementById('canvas');
 const resultsEl = document.getElementById('results');
 const poseColours = [];
 var opacity = 0;
-var scoreColor = 255;
+var scoreColor = 255; 
+
+let colorBox = document.getElementById("myDiv");
 
 document.getElementById('btnFreeze').addEventListener('click', evt => {
   if (cameraEl.paused) {
@@ -97,9 +99,23 @@ function processPoses(poses) {
       const handsHeight = Math.floor(Math.abs(leftWrist.y - rightWrist.y));
       const haaaaaands = Math.floor(Math.abs((leftWrist.y - rightWrist.y)+(leftWrist.x - rightWrist.x)));
 
-      opacity = map_range(handsDistance, 0, 500, 0, 255);
-
-
+      // opacity = map_range(handsDistance, 0, 500, 0, 255);
+      if(handsHeight > 20 && handsHeight <= 50){
+        colorBox.style.backgroundColor = "#E1F5FE";
+      }else if(handsHeight>50 && handsHeight <= 80){
+        colorBox.style.backgroundColor = "#B3E5FC";
+      }else if(handsHeight>80 && handsHeight <= 110){
+        colorBox.style.backgroundColor = "#81D4FA";
+      }else if(handsHeight>110 && handsHeight <= 150){
+        colorBox.style.backgroundColor = "#4FC3F7";
+      }else if(handsHeight>150 && handsHeight <= 180){
+        colorBox.style.backgroundColor = "#29B6F6";
+      }else if(handsHeight>180 && handsHeight <= 210){
+        colorBox.style.backgroundColor = "#03A9F4";
+      }else if(handsHeight>210){
+        colorBox.style.backgroundColor = "#039BE5";
+      }
+    
       var c = canvasEl.getContext('2d');
       c.fillStyle = 'pink';
       c.fillText('hands width: ' + handsDistance, 300, 10);

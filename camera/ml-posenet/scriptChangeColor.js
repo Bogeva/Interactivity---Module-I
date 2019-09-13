@@ -5,6 +5,7 @@ const resultsEl = document.getElementById('results');
 const poseColours = [];
 var opacity = 0;
 var scoreColor = 255; 
+var scoreColor2 = 255;
 
 let colorBox = document.getElementById("myDiv");
 

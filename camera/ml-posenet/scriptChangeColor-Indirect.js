@@ -2,10 +2,12 @@
 const cameraEl = document.getElementById('camera');
 const canvasEl = document.getElementById('canvas');
 const resultsEl = document.getElementById('results');
+const offscreenCanvasEl = document.getElementById('offscreenCanvas');
 const poseColours = [];
 var opacity = 0;
 var scoreColor = 255; 
 var scoreColor2 = 255;
+let rangeOfPeople;
 
 let colorBox = document.getElementById("myDiv");
 
@@ -40,8 +42,14 @@ cameraEl.addEventListener('play', () => {
   canvasEl.width = cameraEl.videoWidth;
   canvasEl.height = cameraEl.videoHeight;
 
+  offscreenCanvasEl.width = cameraEl.videoWidth;
+  offscreenCanvasEl.height = cameraEl.videoHeight;
+
   // Start processing!
   window.requestAnimationFrame(process);
+
+  //call render frame
+  window.requestAnimationFrame(renderFrame);
 });
 
 // Processes the last frame from camera
@@ -54,6 +62,58 @@ function process() {
   }).then(processPoses); /* call processPoses with result */
 }
 
+function renderFrame() {
+  let offscreenC = offscreenCanvasEl.getContext('2d');
+  let c = canvasEl.getContext('2d');
+
+  // 1. Capture to offscreen buffer
+  offscreenC.drawImage(cameraEl, 0, 0);
+
+  // 2. Read the pixel data from this buffer
+  let frame = offscreenC.getImageData(0, 0, offscreenCanvasEl.width, offscreenCanvasEl.height);
+
+  let blueCount = 0;
+
+
+  let totalPixels = frame.data.length / 4; // Get total number of pixels by dividing by 4 (since each pixel uses 4 values)
+  
+  for (let pixelIndex = 0; pixelIndex < totalPixels; pixelIndex++) {
+    let r = frame.data[pixelIndex * 4 + 0];
+    let g = frame.data[pixelIndex * 4 + 1];
+    let b = frame.data[pixelIndex * 4 + 2];
+
+    let grey = (r+g+b)/3;
+    if (grey < 150) { 
+      // frame.data[pixelIndex * 4 + 3] = 0;
+      blueCount++;
+    }
+    if(b < 50){
+      frame.data[pixelIndex * 4 + 2]=0;
+    }
+  }
+
+  // % of image that is 'blue enough'
+  let blueValue = 100 - Math.floor(100 * (blueCount / (frame.data.length / 4)));
+  rangeOfPeople = Math.floor(map_range(blueValue,0,100,2,5));
+  console.log(rangeOfPeople);
+  // turn the rectangle from white to black depending on the brightness of the room
+  colorBox.style.backgroundColor='rgb('+blueValue*2.55+','+blueValue*2.55+','+blueValue*2.55+')';
+  
+    
+  // Write our modified frame back to the buffer
+  offscreenC.putImageData(frame, 0, 0);
+
+  // Draw buffer to the visible canvas
+  c.drawImage(offscreenCanvasEl, 0, 0);
+
+  c.fillStyle = 'white';
+  c.font = '48px "Fira Code", Monaco, "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace';
+  c.fillText(blueValue + "%", 100, 100);
+
+  // Repeat!
+  window.requestAnimationFrame(renderFrame);
+}
+
 function map_range(value, low1, high1, low2, high2) {
   return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
 }
@@ -62,70 +122,12 @@ function processPoses(poses) {
   // For debug purposes, draw points
   drawPoses(poses);
 
-
-  // Demo of using position:
-  //  Calculates a 'slouch factor' - difference in Y between left/right shoulders
-  /*if (poses.length == 1 && poses[0].score > 0.3) {
-    const leftShoulder = getKeypointPos(poses, 'leftShoulder');
-    const rightShoulder = getKeypointPos(poses, 'rightShoulder');
-    if (leftShoulder != null && rightShoulder != null) {
-      const slouchFactor = Math.floor(Math.abs(leftShoulder.y - rightShoulder.y));
-      opacity = slouchFactor/130;
-
-      var c = canvasEl.getContext('2d');
-      c.fillStyle = 'black';
-      c.fillText('Slouch factor: ' + slouchFactor, 100, 10);
-    }
-  }*/
-
-  //  Calculates a 'head tilt factor' - difference in Y between left/right ears
-  /*if (poses.length == 1 && poses[0].score > 0.3) {
-    const leftEar = getKeypointPos(poses, 'leftEar');
-    const rightEar = getKeypointPos(poses, 'rightEar');
-    if (leftEar != null && rightEar != null) {
-      const headTilt = Math.floor(Math.abs(leftEar.y - rightEar.y));
-
-      var c = canvasEl.getContext('2d');
-      c.fillStyle = 'black';
-      c.fillText('Head tilt factor: ' + headTilt, 200, 10);
-    }
-  }*/
-
   //  Calculates a 'hands distance' - difference in Y between left/right ears
-  if (poses.length == 1 && poses[0].score > 0.3) {
-    const leftWrist = getKeypointPos(poses, 'leftWrist');
-    const rightWrist = getKeypointPos(poses, 'rightWrist');
-    if (leftWrist != null && rightWrist != null) {
-      const handsDistance = Math.floor(Math.abs(leftWrist.x - rightWrist.x));
-      const handsHeight = Math.floor(Math.abs(leftWrist.y - rightWrist.y));
-      const haaaaaands = Math.floor(Math.abs((leftWrist.y - rightWrist.y)+(leftWrist.x - rightWrist.x)));
-
-      // opacity = map_range(handsDistance, 0, 500, 0, 255);
-      if(handsHeight > 20 && handsHeight <= 50){
-        colorBox.style.backgroundColor = "#E1F5FE";
-      }else if(handsHeight>50 && handsHeight <= 80){
-        colorBox.style.backgroundColor = "#B3E5FC";
-      }else if(handsHeight>80 && handsHeight <= 110){
-        colorBox.style.backgroundColor = "#81D4FA";
-      }else if(handsHeight>110 && handsHeight <= 150){
-        colorBox.style.backgroundColor = "#4FC3F7";
-      }else if(handsHeight>150 && handsHeight <= 180){
-        colorBox.style.backgroundColor = "#29B6F6";
-      }else if(handsHeight>180 && handsHeight <= 210){
-        colorBox.style.backgroundColor = "#03A9F4";
-      }else if(handsHeight>210){
-        colorBox.style.backgroundColor = "#039BE5";
-      }
-    
-      scoreColor = map_range(handsDistance, 0, 500, 0, 255);
-
-      opacity = map_range(handsHeight, 0, 500, 0, 0.8);
-
-      var c = canvasEl.getContext('2d');
-      c.fillStyle = 'pink';
-      c.fillText('hands width: ' + handsDistance, 300, 10);
-      c.fillText('hands height: ' + handsHeight, 200, 10);
-      c.fillText('hands: ' + haaaaaands, 100, 10);
+  if (poses.length == rangeOfPeople && poses[0].score > 0.3) {
+    for(y=0; y< poses.length; y++){
+      const leftWrist = getKeypointPos(poses, 'leftWrist');
+      const leftEar = getKeypointPos(poses, 'leftEar');
+      console.log(leftWrist, leftEar);
     }
   }
 
@@ -156,13 +158,13 @@ function drawPoses(poses) {
 
   // Fade out image
   c.fillStyle = 'rgba('+scoreColor+','+scoreColor2+',255,'+opacity+')';
-  //.log(c.fillStyle);
+  //console.log(c.fillStyle);
   c.fillRect(0, 0, cameraEl.videoWidth, cameraEl.videoHeight);
 
   // Draw each detected pose
-  for (var i = 0; i < poses.length; i++) {
-    drawPose(i, poses[i], c);
-  }
+  // for (var i = 0; i < poses.length; i++) {
+  //   drawPose(i, poses[i], c);
+  // }
 
   // If there's no poses, draw a warning
   if (poses.length == 0) {
@@ -177,7 +179,9 @@ function drawPose(index, pose, c) {
   // Lookup or generate random colour for this pose index
   if (!poseColours[index]) poseColours[index] = getRandomColor();
   const colour = poseColours[index];
-
+  
+ 
+  opacity = map_range(pose.score, 0, 0.6, 0, 1);
   //console.log(scoreColor);
 
   // Draw prediction info
@@ -185,20 +189,8 @@ function drawPose(index, pose, c) {
   c.fillStyle = colour;
   c.fillText(Math.floor(pose.score * 100) + '%', 10, (index * 20) + 10);
 
-  // Draw each pose part
-  pose.keypoints.forEach(kp => {
-    // Draw a dot for each keypoint
-    c.beginPath();
-    c.arc(kp.position.x, kp.position.y, 5, 0, 2 * Math.PI);
-    c.fill();
-
-    // Draw the keypoint's score (not very useful)
-    //c.fillText(Math.floor(kp.score * 100) + '%', kp.position.x + 7, kp.position.y - 3);
-
-    // Draw name of keypoint
-    c.fillText(kp.part, kp.position.x - 3, kp.position.y + 6);
-  });
 }
+  
 
 // ------------------------
 function getRandomColor() {

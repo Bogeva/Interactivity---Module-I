@@ -3,6 +3,7 @@ const cameraEl = document.getElementById('camera');
 const canvasEl = document.getElementById('canvas');
 const resultsEl = document.getElementById('results');
 const offscreenCanvasEl = document.getElementById('offscreenCanvas');
+let backgroundBox = document.getElementById("background");
 const poseColours = [];
 var opacity = 0;
 var scoreColor = 255; 
@@ -96,6 +97,7 @@ function renderFrame() {
   let blueValue = 100 - Math.floor(100 * (blueCount / (frame.data.length / 4)));
   rangeOfPeople = Math.floor(map_range(blueValue,0,100,2,5));
   console.log(rangeOfPeople);
+
   // turn the rectangle from white to black depending on the brightness of the room
   colorBox.style.backgroundColor='rgb('+blueValue*2.55+','+blueValue*2.55+','+blueValue*2.55+')';
   
@@ -127,7 +129,21 @@ function processPoses(poses) {
     for(y=0; y< poses.length; y++){
       const leftWrist = getKeypointPos(poses, 'leftWrist');
       const leftEar = getKeypointPos(poses, 'leftEar');
-      console.log(leftWrist, leftEar);
+      // console.log(leftWrist, leftEar);
+      if (leftWrist != null && leftEar != null) {
+        const closeness = Math.floor(Math.abs(leftWrist.x - leftEar.x));
+        
+        if(closeness <= 50){
+          console.log('hi');
+          backgroundBox.style.backgroundColor = "blue";
+        } else if (closeness > 50 && closeness <= 80){
+          backgroundBox.style.backgroundColor = 'cyan';
+        } else if (closeness > 80 && closeness <= 110){
+          backgroundBox.style.backgroundColor = 'pink';
+        } else if (closeness >110 && closeness <= 150){
+          backgroundBox.style.backgroundColor = 'turquoise';
+        }
+      }
     }
   }
 

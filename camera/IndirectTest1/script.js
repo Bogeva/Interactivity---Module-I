@@ -82,6 +82,10 @@ function renderFrame() {
   let brightness = Math.floor(100 * (brightCount / totalPixels));
   let difference = Math.floor(100 * (diffCount / totalPixels));
 
+  if (difference>20) {
+    console.log('you did it');
+  }
+
   c.fillStyle = 'white';
   c.font = '28px "Fira Code", Monaco, "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace';
   c.fillText(difference + '%', 100, 100);

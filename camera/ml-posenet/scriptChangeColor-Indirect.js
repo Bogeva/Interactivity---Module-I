@@ -125,7 +125,8 @@ function processPoses(poses) {
   drawPoses(poses);
 
   //  Calculates a 'hands distance' - difference in Y between left/right ears
-  if (poses.length == rangeOfPeople && poses[0].score > 0.3) {
+
+  if (poses.length == rangeOfPeople && poses[rangeOfPeople-1].score > 0.3) {
     for(y=0; y< poses.length; y++){
       const leftWrist = getKeypointPos(poses, 'leftWrist');
       const leftEar = getKeypointPos(poses, 'leftEar');
